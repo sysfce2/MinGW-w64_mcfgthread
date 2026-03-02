@@ -348,8 +348,9 @@ DllMainCRTStartup(PVOID instance, ULONG reason, PVOID reserved)
       {
       case DLL_PROCESS_ATTACH:
         __MCF_gthread_initialize_globals();
-        __MCF_CHECK(GetModuleHandleExW(0x05, instance, &dummy2));  /* PIN | FROM_ADDRESS */
-        __MCF_CHECK(VirtualProtect((void*) &__MCF_g, sizeof(__MCF_g), PAGE_READONLY, &dummy1));
+        GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                           instance, &dummy2);
+        VirtualProtect((void*) &__MCF_g, sizeof(__MCF_g), PAGE_READONLY, &dummy1);
         return 1;
 
       case DLL_THREAD_DETACH:
