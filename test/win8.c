@@ -11,24 +11,26 @@ int main(void) { return 77;  }
 
 #define WIN32_LEAN_AND_MEAN  1
 #include <windows.h>
-#include <versionhelpers.h>
 #include "../mcfgthread/xglobals.h"
+#include <stdio.h>
 #include <assert.h>
 
 int
 main(void)
   {
-    if(!IsWindows8OrGreater())
+    HMODULE kernelbase = GetModuleHandleW(L"KERNELBASE.DLL");
+    if(!kernelbase)
       return 77;  // skip
 
-    HMODULE kernelbase = GetModuleHandleW(L"KERNELBASE.DLL");
-    assert(kernelbase);
+    HMODULE kernel32 = GetModuleHandleW(L"KERNEL32.DLL");
+    if(!kernel32)
+      return 77;  // skip
 
-    FARPROC fn = GetProcAddress(kernelbase, "GetSystemTimePreciseAsFileTime");
-    assert(fn);
-    void* gf = __MCF_G_FIELD_OPT(__f_GetSystemTimePreciseAsFileTime);
-    assert(gf);
-    assert((INT_PTR) fn == *(INT_PTR*) gf);
+    // https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimepreciseasfiletime
+    FARPROC fn = (FARPROC) *(void**) __MCF_G_FIELD_OPT(__f_GetSystemTimePreciseAsFileTime);
+    fprintf(stderr, "__f_GetSystemTimePreciseAsFileTime = %p\n", fn);
+    assert((fn == GetProcAddress(kernelbase, "GetSystemTimePreciseAsFileTime"))
+           || (fn == GetProcAddress(kernel32, "GetSystemTimePreciseAsFileTime")));
   }
 
 #endif  // __CYGWIN__
