@@ -242,7 +242,13 @@ __MCF_seh_top(EXCEPTION_RECORD* rec, PVOID estab_frame, CONTEXT* ctx, PVOID disp
 
 #if defined __MCF_M_X8632
 
-/* On x86, SEH is stack-based.  */
+/* On x86, SEH is stack-based. Each handler will be attached to the scope of
+ * a local record object.  */
+#  define __MCF_USING_SEH_HANDLER(fn, ...)  \
+    EXCEPTION_REGISTRATION_RECORD* const __MCF_i386_seh_record  \
+           __attribute__((__cleanup__(__MCF_i386_seh_cleanup)))  \
+      = __MCF_i386_seh_install((DWORD []) { 0, (DWORD) (fn), __VA_ARGS__ })  /* no semicolon  */
+
 __MCF_ALWAYS_INLINE
 EXCEPTION_REGISTRATION_RECORD*
 __MCF_i386_seh_install(DWORD* storage)
@@ -263,43 +269,43 @@ __MCF_i386_seh_cleanup(EXCEPTION_REGISTRATION_RECORD* const* ref)
     __MCF_TEB_STORE_32_ABS(0, record->Next);
   }
 
-#  define __MCF_USING_SEH_HANDLER(fn, ...)  \
-    EXCEPTION_REGISTRATION_RECORD* const __MCF_i386_seh_record__  \
-            __attribute__((__cleanup__(__MCF_i386_seh_cleanup)))  \
-      = __MCF_i386_seh_install((DWORD []) { 0, (DWORD) (fn), __VA_ARGS__ })  /* no semicolon  */
+/* Some old code assumes that ESP is always aligned to a 16-byte boundary,
+ * but that's not guaranteed for callbacks from system DLLs, so it has to be
+ * enforced; otherwise SSE instructions may fault.  */
+#  define __MCF_REALIGN_SP    __attribute__((__force_align_arg_pointer__))
 
+/* `arg` shall be passed both via the ECX register and on the stack, to allow
+ * both `__cdecl` and `__thiscall` functions to work properly.  */
 __MCF_ALWAYS_INLINE
 void
 __MCF_invoke_cxa_dtor(__MCF_cxa_dtor_any_ dtor, void* arg)
   {
-    /* The argument is passed both via the ECX register and on the stack, to
-     * allow both `__cdecl` and `__thiscall` functions to work properly.  */
+    register int eax __asm__("eax");
+    register int edx __asm__("edx");
+    __asm__ ("" : "=r"(eax), "=r"(edx));
     typedef __attribute__((__regparm__(3))) void omni_type(int, int, void*, void*);
-    int eax, edx;
-    __asm__ ("" : "=a"(eax), "=d"(edx));  /* dummy */
     (* __MCF_CAST_PTR(omni_type, dtor.__cdecl_ptr)) (eax, edx, arg, arg);
   }
 
-/* GCC assumes that ESP is always aligned to a 16-byte boundary, but for MSVC
- * it might not be aligned, so it has to be enforced, otherwise SSE instructions
- * may fault.  */
-#  define __MCF_REALIGN_SP    __attribute__((__force_align_arg_pointer__))
-
 #else  /* !defined __MCF_M_X8632 */
 
-/* Otherwise, SEH is table-based. This code must work on both x86_64 and ARM64,
- * as well as ARM64EC.  */
+/* SEH is table-based. Only x86-64 supports pure unwind handlers that are not
+ * exception handlers; for simplicity, we use only dual handlers. This also
+ * works on ARM64 and ARM64EC.  */
 #  define __MCF_USING_SEH_HANDLER(fn)  \
     __asm__ (".seh_handler %c0, @except, @unwind" : : "i"(fn))  /* no semicolon  */
 
+/* The stack is always aligned to 16-byte boundaries, as required by the ABI,
+ * so this expands to nothing.  */
+#  define __MCF_REALIGN_SP
+
+/* There is only ever one calling convention.  */
 __MCF_ALWAYS_INLINE
 void
 __MCF_invoke_cxa_dtor(__MCF_cxa_dtor_any_ dtor, void* arg)
   {
     (* dtor.__cdecl_ptr) (arg);
   }
-
-#  define __MCF_REALIGN_SP    /* nothing */
 
 #endif  /* !defined __MCF_M_X8632 */
 
