@@ -245,10 +245,12 @@ __MCF_seh_top(EXCEPTION_RECORD* rec, PVOID estab_frame, CONTEXT* ctx, PVOID disp
 /* On x86, SEH is stack-based.  */
 __MCF_ALWAYS_INLINE
 EXCEPTION_REGISTRATION_RECORD*
-__MCF_i386_seh_install(EXCEPTION_REGISTRATION_RECORD* record)
+__MCF_i386_seh_install(DWORD* storage)
   {
+    EXCEPTION_REGISTRATION_RECORD* const restrict record = (void*) storage;
     __MCF_TEB_LOAD_32_ABS(&(record->Next), 0);
     __MCF_TEB_STORE_32_ABS(0, record);
+    _MCF_signal_fence_acq();
     return record;
   }
 
@@ -256,14 +258,15 @@ __MCF_ALWAYS_INLINE
 void
 __MCF_i386_seh_cleanup(EXCEPTION_REGISTRATION_RECORD* const* ref)
   {
-    __MCF_TEB_STORE_32_ABS(0, (*ref)->Next);
+    EXCEPTION_REGISTRATION_RECORD* const restrict record = *ref;
+    _MCF_signal_fence_rel();
+    __MCF_TEB_STORE_32_ABS(0, record->Next);
   }
 
 #  define __MCF_USING_SEH_HANDLER(fn, ...)  \
     EXCEPTION_REGISTRATION_RECORD* const __MCF_i386_seh_record__  \
             __attribute__((__cleanup__(__MCF_i386_seh_cleanup)))  \
-      = __MCF_i386_seh_install((EXCEPTION_REGISTRATION_RECORD*)  \
-            (DWORD []) { 0, (DWORD) (fn) ,##__VA_ARGS__ })  /* no semicolon  */
+      = __MCF_i386_seh_install((DWORD []) { 0, (DWORD) (fn), __VA_ARGS__ })  /* no semicolon  */
 
 __MCF_ALWAYS_INLINE
 void
