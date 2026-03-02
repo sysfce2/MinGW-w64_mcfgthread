@@ -216,13 +216,24 @@ typedef LPVOID __stdcall typeof_TlsGetValue2(ULONG);
 #define __MCF_LAZY_D_(name)   typeof_##name* __f_##name
 #define __MCF_LAZY_P_(name)   __f_##name
 
+__MCF_ALWAYS_INLINE
+FARPROC
+__MCF_do_lazy_load(FARPROC* out, HMODULE dll, const char* name)
+  {
+    if(!dll)
+      return __MCF_nullptr;
+
+    FARPROC ptr = GetProcAddress(dll, name);
+    if(!ptr)
+      return __MCF_nullptr;
+
+    __MCF_SET_IF(out, ptr);
+    return ptr;
+  }
+
 #define __MCF_LAZY_LOAD(out, dll, name)  \
-    ({ typeof_##name* __temp1 = __MCF_nullptr;  \
-       if(dll)  \
-         __temp1 = __MCF_CAST_PTR(typeof_##name, GetProcAddress(dll, #name));  \
-       if(__temp1)  \
-         *(out) = __temp1;  \
-       __temp1;  })
+    (__MCF_CAST_PTR(typeof_##name,  \
+        __MCF_do_lazy_load(__MCF_CAST_PTR(FARPROC, out), dll, #name)))
 
 /* Declare helper functions here.  */
 __MCF_XGLOBALS_IMPORT
