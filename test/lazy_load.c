@@ -27,10 +27,16 @@ main(void)
       return 77;  // skip
 
     // https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimepreciseasfiletime
-    FARPROC fn = (FARPROC) *(void**) __MCF_G_FIELD_OPT(__f_GetSystemTimePreciseAsFileTime);
-    fprintf(stderr, "__f_GetSystemTimePreciseAsFileTime = %p\n", fn);
-    assert((fn == GetProcAddress(kernelbase, "GetSystemTimePreciseAsFileTime"))
-           || (fn == GetProcAddress(kernel32, "GetSystemTimePreciseAsFileTime")));
+    void* fn = (void*) __MCF_G_LAZY(GetSystemTimePreciseAsFileTime);
+    fprintf(stderr, "GetSystemTimePreciseAsFileTime = %p\n", fn);
+    assert((fn == (void*) GetProcAddress(kernelbase, "GetSystemTimePreciseAsFileTime"))
+           || (fn == (void*) GetProcAddress(kernel32, "GetSystemTimePreciseAsFileTime")));
+
+    // https://learn.microsoft.com/en-us/windows/win32/api/realtimeapiset/nf-realtimeapiset-queryinterrupttime
+    // NOTE: Despite documentation, this function is only exported from KERNELBASE.
+    fn = (void*) __MCF_G_LAZY(QueryInterruptTime);
+    fprintf(stderr, "QueryInterruptTime = %p\n", fn);
+    assert(fn == (void*) GetProcAddress(kernelbase, "QueryInterruptTime"));
   }
 
 #endif  // __CYGWIN__
