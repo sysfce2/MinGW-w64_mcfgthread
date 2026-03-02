@@ -187,8 +187,9 @@ __MCF_gthread_initialize_globals(void)
     __MCF_CHECK(QueryPerformanceFrequency(&pfreq));
     __MCF_crt_pf_recip = 1000 / (double) pfreq.QuadPart;
 
-    __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNELBASE.DLL", &__MCF_crt_kernelbase));
     __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"NTDLL.DLL", &__MCF_crt_ntdll));
+    __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNELBASE.DLL", &__MCF_crt_kernelbase));
+    __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNEL32.DLL", &__MCF_crt_kernel32));
 
     __MCF_crt_TlsGetValue = TlsGetValue;
     __MCF_LAZY_LOAD(&__MCF_crt_TlsGetValue, __MCF_crt_kernelbase, TlsGetValue2);
@@ -238,7 +239,7 @@ __MCF_gthread_initialize_globals(void)
     __MCF_CHECK(__MCF_g->__tls_index != UINT32_MAX);
 
     /* Perform lazy binding for newer functions.  */
-    __MCF_G_SET_LAZY(__MCF_crt_kernelbase, GetSystemTimePreciseAsFileTime);  /* win8 */
+    __MCF_G_SET_LAZY(__MCF_crt_kernel32, GetSystemTimePreciseAsFileTime);  /* win8 */
     __MCF_G_SET_LAZY(__MCF_crt_kernelbase, QueryInterruptTime);  /* win10 */
 
     /* Attach the main thread and make it joinable. The structure should
