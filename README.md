@@ -157,6 +157,7 @@ and unlocks the primitive mutex, releasing all threads that are waiting on it.
 |`HeapReAlloc`                  |KERNEL32        |[Windows API](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heaprealloc) |
 |`HeapSetInformation`           |KERNEL32        |[Windows API](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation) |
 |`HeapSize`                     |KERNEL32        |[Windows API](https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsize) |
+|`LoadLibraryExW`               |KERNEL32        |[Windows API](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryexw) |
 |`NtClose`                      |NTDLL           |[Windows Driver API](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwclose) |
 |`NtCreateSection`              |NTDLL           |[Windows Driver API](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatesection) |
 |`NtDelayExecution`             |NTDLL           |Undocumented |

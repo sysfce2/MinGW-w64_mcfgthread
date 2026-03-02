@@ -187,9 +187,11 @@ __MCF_gthread_initialize_globals(void)
     HeapSetInformation(__MCF_crt_heap, HeapEnableTerminationOnCorruption, __MCF_nullptr, 0);
 #endif
 
-    __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"NTDLL.DLL", &__MCF_crt_ntdll));
-    __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNELBASE.DLL", &__MCF_crt_kernelbase));
-    __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNEL32.DLL", &__MCF_crt_kernel32));
+    /* Load system DLLs. It's not necessary to call `FreeLibrary()`, as these
+     * can't be unloaded.  */
+    __MCF_crt_ntdll = LoadLibraryExW(L"NTDLL.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    __MCF_crt_kernelbase = LoadLibraryExW(L"KERNELBASE.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    __MCF_crt_kernel32 = LoadLibraryExW(L"KERNEL32.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 
     __MCF_crt_TlsGetValue = TlsGetValue;
     __MCF_LAZY_LOAD(&__MCF_crt_TlsGetValue, __MCF_crt_kernel32, TlsGetValue2);

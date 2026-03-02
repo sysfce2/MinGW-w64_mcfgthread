@@ -28,6 +28,7 @@ EXPORTS
   HeapReAlloc@16@
   HeapSetInformation@16@
   HeapSize@12@
+  LoadLibraryExW@12@
   QueryPerformanceCounter@4@
   QueryPerformanceFrequency@4@
   QueryUnbiasedInterruptTime@4@
