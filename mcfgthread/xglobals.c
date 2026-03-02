@@ -343,14 +343,14 @@ int
 __stdcall
 DllMainCRTStartup(PVOID instance, ULONG reason, PVOID reserved)
   {
-    ULONG dummy1;
-    HMODULE dummy2 = reserved;
+    (void) instance;
+    (void) reserved;
 
     switch(reason)
       {
       case DLL_PROCESS_ATTACH:
         __MCF_gthread_initialize_globals();
-        VirtualProtect((void*) &__MCF_g, sizeof(__MCF_g), PAGE_READONLY, &dummy1);
+        VirtualProtect((void*) &__MCF_g, sizeof(__MCF_g), PAGE_READONLY, &(DWORD) { 0 } );
         return 1;
 
       case DLL_THREAD_DETACH:
