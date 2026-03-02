@@ -305,11 +305,12 @@ __MCF_gthread_on_thread_exit(void)
 /* These are constants that have to be initialized at load time. The
  * initializers prevent them from being placed into the`.bss` section.  */
 __MCF_BR(GUID) const __MCF_crt_gthread_guid = { __MCF_GUID(9FB2D15C,C5F2,4AE7,868D,2769591B8E92) };
-HANDLE __MCF_crt_heap = __MCF_BAD_PTR;
-double __MCF_crt_pf_recip = 1;
 SYSTEM_INFO __MCF_crt_sysinfo = { .dwPageSize = 1 };
-HMODULE __MCF_crt_kernelbase = __MCF_BAD_PTR;
+double __MCF_crt_pf_recip = 1;
+HANDLE __MCF_crt_heap = __MCF_BAD_PTR;
 HMODULE __MCF_crt_ntdll = __MCF_BAD_PTR;
+HMODULE __MCF_crt_kernelbase = __MCF_BAD_PTR;
+HMODULE __MCF_crt_kernel32 = __MCF_BAD_PTR;
 typeof_TlsGetValue2* __MCF_crt_TlsGetValue = __MCF_BAD_PTR;
 
 /* This is a pointer to global data. If this library is linked statically,

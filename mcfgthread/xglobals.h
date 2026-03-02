@@ -471,10 +471,11 @@ __MCF_STATIC_ASSERT(offsetof(__MCF_crt_xglobals, __thread_oom_self_st) == __MCF_
 /* These are constants that have to be initialized at load time.  */
 extern __MCF_ALIGNED(8) __MCF_BR(GUID) const __MCF_crt_gthread_guid;
 extern SYSTEM_INFO __MCF_XGLOBALS_READONLY __MCF_crt_sysinfo;
-extern HANDLE __MCF_XGLOBALS_READONLY __MCF_crt_heap;
 extern double __MCF_XGLOBALS_READONLY __MCF_crt_pf_recip;
-extern HMODULE __MCF_XGLOBALS_READONLY __MCF_crt_kernelbase;
+extern HANDLE __MCF_XGLOBALS_READONLY __MCF_crt_heap;
 extern HMODULE __MCF_XGLOBALS_READONLY __MCF_crt_ntdll;
+extern HMODULE __MCF_XGLOBALS_READONLY __MCF_crt_kernelbase;
+extern HMODULE __MCF_XGLOBALS_READONLY __MCF_crt_kernel32;
 extern typeof_TlsGetValue2* __MCF_XGLOBALS_READONLY __MCF_crt_TlsGetValue;
 
 /* This is a pointer to the process-specific data.
