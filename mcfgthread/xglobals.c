@@ -177,15 +177,15 @@ __MCF_gthread_initialize_globals(void)
   {
     GetSystemInfo(&__MCF_crt_sysinfo);
 
-#ifdef __MCF_DEBUG
-    __MCF_CHECK(HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, __MCF_nullptr, 0));
-#endif
-    __MCF_crt_heap = GetProcessHeap();
-    __MCF_CHECK(__MCF_crt_heap);
-
     LARGE_INTEGER pfreq;
     __MCF_CHECK(QueryPerformanceFrequency(&pfreq));
     __MCF_crt_pf_recip = 1000 / (double) pfreq.QuadPart;
+
+    __MCF_crt_heap = GetProcessHeap();
+    __MCF_CHECK(__MCF_crt_heap);
+#ifdef __MCF_DEBUG
+    HeapSetInformation(__MCF_crt_heap, HeapEnableTerminationOnCorruption, __MCF_nullptr, 0);
+#endif
 
     __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"NTDLL.DLL", &__MCF_crt_ntdll));
     __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNELBASE.DLL", &__MCF_crt_kernelbase));
