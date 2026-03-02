@@ -192,7 +192,7 @@ __MCF_gthread_initialize_globals(void)
     __MCF_CHECK(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, L"KERNEL32.DLL", &__MCF_crt_kernel32));
 
     __MCF_crt_TlsGetValue = TlsGetValue;
-    __MCF_LAZY_LOAD(&__MCF_crt_TlsGetValue, __MCF_crt_kernelbase, TlsGetValue2);
+    __MCF_LAZY_LOAD(&__MCF_crt_TlsGetValue, __MCF_crt_kernel32, TlsGetValue2);
 
     /* Generate the unique name for this process.  */
     static WCHAR gnbuffer[] = L"Local\\__MCF_crt_xglobals_*?pid???_#?cookie????????";
