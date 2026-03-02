@@ -324,7 +324,7 @@ template<> struct __MCF_static_assert_helper<true> { static const int __one = 1;
 /* The `__MCF_ASSERT()` and `__MCF_CHECK()` macros perform run-time checks. If
  * an argument yields false, `__MCF_ASSERT()` results in undefined behavior,
  * and `__MCF_CHECK()` effects abnormal termination of the current program.  */
-__MCF_FWD_IMPORT __MCF_NEVER_RETURN __MCF_NEVER_INLINE __MCF_FN_COLD
+__MCF_FWD_IMPORT __MCF_NEVER_RETURN __MCF_FN_COLD
 void
 __MCF_runtime_failure(const char* __where)
   __MCF_noexcept;
