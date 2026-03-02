@@ -330,7 +330,7 @@ foreach src : test_src
   endif
 
   if basename in [ 'teb_att.c' ]
-    test_c_args = [ '-masm=att' ]
+    test_c_args = [ cc.get_supported_arguments('-masm=att') ]
   endif
 
   if basename in [ 'cxx11_no_exceptions.cpp' ]
