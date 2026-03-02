@@ -492,7 +492,7 @@ extern __MCF_crt_xglobals* __MCF_XGLOBALS_READONLY restrict __MCF_g;
 #define __MCF_G_FIELD_OPT(field)  \
     ((__MCF_g->__self_size >= offsetof(__MCF_crt_xglobals, field) + sizeof(__MCF_g->field))  \
      ? &(__MCF_g->field)  \
-     : __MCF_nullptr)
+     : (void*) __MCF_nullptr)
 
 #define __MCF_G_HAS_LAZY(name)   (__MCF_G_FIELD_OPT(__MCF_LAZY_P_(name)) && __MCF_g->__MCF_LAZY_P_(name))
 #define __MCF_G_LAZY(name)           (*(__MCF_g->__MCF_LAZY_P_(name)))
